@@ -13,21 +13,15 @@ public class ListerArbo {
 	private static String repoMusique = "H:\\";
 	private static Path cheminMusique = Paths.get(repoMusique);
 
-	// public GestionFlux() { }
-
 	protected static List<Path> listerGenre() {
 		List<Path> genres = new ArrayList<Path>();
-		try {
-			DirectoryStream<Path> stream = Files.newDirectoryStream(cheminMusique);
-			for (Path entry : stream) {
-				// System.out.println(entry);
-				if (!Files.isRegularFile(entry) && (!entry.startsWith("H:\\$RECYCLE.BIN"))
-						&& (!entry.startsWith("H:\\Mes sélections")) && (!entry.startsWith("H:\\Playlists"))
-						&& (!entry.startsWith("H:\\System Volume Information"))) {
-					genres.add(entry);
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(cheminMusique)) {
+			stream.forEach(p -> {
+				if (Files.isDirectory(p) && (!p.startsWith("H:\\$RECYCLE.BIN")) && (!p.startsWith("H:\\Mes sélections"))
+						&& (!p.startsWith("H:\\Playlists")) && (!p.startsWith("H:\\System Volume Information"))) {
+					genres.add(p);
 				}
-
-			}
+			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,31 +34,31 @@ public class ListerArbo {
 
 	public static List<Path> listerGroupe() {
 		List<Path> groupes = new ArrayList<Path>();
-		for (Path p : listerGenre()) {
-			try {
-				DirectoryStream<Path> stream = Files.newDirectoryStream(p);
-				for (Path entry : stream) {
-					// System.out.println(entry);
-					groupes.add(entry);
-				}
+		ListerArbo.listerGenre().stream().forEachOrdered(pa -> {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(pa)) {
+				stream.forEach(p -> {
+					groupes.add(p);
+				});
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-
+		});
 		return groupes;
 	}
 
 	public static List<Path> listerGroupe(Path pGenre) {
 		List<Path> groupes = new ArrayList<Path>();
 
-		try {
-			DirectoryStream<Path> stream = Files.newDirectoryStream(pGenre);
-			for (Path entry : stream) {
-				// System.out.println(entry);
-				groupes.add(entry);
-			}
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(pGenre)) {
+			stream.forEach(p -> {
+				groupes.add(p);
+			});
+//			
+//			for (Path entry : stream) {
+//				// System.out.println(entry);
+//				groupes.add(entry);
+//			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,62 +69,42 @@ public class ListerArbo {
 
 	protected static List<Path> listerAlbums() {
 		List<Path> albums = new ArrayList<Path>();
-		for (Path p : listerGroupe()) {
-			try {
-				DirectoryStream<Path> stream = Files.newDirectoryStream(p);
-				for (Path entry : stream) {
-					// System.out.println(entry);
-					if (!Files.isRegularFile(entry)) {
-						albums.add(entry);
+		ListerArbo.listerGroupe().stream().forEachOrdered(pa -> {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(pa)) {
+				stream.forEach(p -> {
+					if (Files.isDirectory(p)) {
+						// --TODO parser le contenu s'il y a encore des dossiers
+						p.forEach(pat -> {
+							if (Files.isDirectory(pat)) {
+								albums.add(pat);
+							}
+						});
+						albums.add(p);
+					} else {
+						albums.add(pa);
 					}
-				}
+				});
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
-
-		return albums;
-	}
-
-	protected static List<Path> listerAlbum(Path pGroupe) {
-		List<Path> albums = new ArrayList<Path>();
-
-		try {
-			DirectoryStream<Path> stream = Files.newDirectoryStream(pGroupe);
-			for (Path entry : stream) {
-				// System.out.println(entry);
-				if (!Files.isRegularFile(entry)) {
-					albums.add(entry);
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("nb d'album " + albums.size() + " du groupe " + pGroupe);
+		});
 		return albums;
 	}
 
 	protected static List<Path> listerChanson(Path pAlbum) {
 		List<Path> chansons = new ArrayList<Path>();
-
-		try {
-			DirectoryStream<Path> stream = Files.newDirectoryStream(pAlbum);
-			for (Path entry : stream) {
-				// System.out.println(entry);
-				if (Files.isRegularFile(entry)) {
-					String vChemin = entry.toString();
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(pAlbum)) {
+			stream.forEach(p -> {
+				if (Files.isRegularFile(p)) {
+					String vChemin = p.toString();
 					String ext = vChemin.substring(vChemin.lastIndexOf(".")); // récupère l'extention
 					if (ext.equalsIgnoreCase(".mp3") || ext.equalsIgnoreCase(".flac") || ext.equalsIgnoreCase(".wma")
 							|| ext.equalsIgnoreCase(".m3u") || ext.equalsIgnoreCase(".m4a")) {
-						chansons.add(entry);
+						chansons.add(p);
 					}
 				}
-
-			}
+			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("nb de chansons " + chansons.size() + " dans l'album " + pAlbum);
