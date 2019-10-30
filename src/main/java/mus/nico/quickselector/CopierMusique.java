@@ -36,6 +36,8 @@ public class CopierMusique {
 	private List<String> listeAlbumsAjoutes;
 	private List<String> listeAlea;
 
+	private boolean existence;
+
 	public CopierMusique(Path pSce, Path pDest, List<Boolean> pOptions) {
 		this.setCheminSce(pSce);
 		this.setCheminDest(pDest);
@@ -63,7 +65,6 @@ public class CopierMusique {
 				// System.out.println("taille repo " + entry + " " + size);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -90,7 +91,6 @@ public class CopierMusique {
 				System.out.println(
 						"album copier : " + this.mesAlbums.get(alea).toString() + " espace restant " + espaceRestant);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -100,42 +100,48 @@ public class CopierMusique {
 	public void copierAlbumJournee() {
 		this.listeAlbumsAjoutes = new ArrayList<String>();
 		// this.mesAlbums = ListerArbo.listerAlbums();
-		System.out.println("CTRL------------------" + this.cheminDest.getFileName());
+		System.out.println("CTRL------------------" + this.cheminDest.toString());
 		Long espaceRestant = this.calculEspace(this.cheminDest.toFile());
 		int compteur = 0;
 		while (espaceRestant > 500000000 && compteur < 10) {
 			try {
 				String dossier = this.mesAlbums.get(this.tirageAleatoire(this.mesAlbums.size())).toString()
 						.substring(3);
+				String artiste = dossier.split("\\\\")[1];
+				String genre = dossier.split("\\\\")[0];
+				// System.out.println("CTRL-------artiste : " + artiste);
 				for (String s : this.listeAlbumsAjoutes) {
-					String genre = "";
-					String[] splitArray = null; // tableau de chaînes
-					splitArray = s.split("\\\\");
-					genre = splitArray[0] + "\\" + splitArray[1];
-					System.out.println("CTRL-------genre : " + genre);
 
-					while (dossier.contains(genre)) {
+					while (s.contains(artiste)) {
 						dossier = this.mesAlbums.get(this.tirageAleatoire(this.mesAlbums.size())).toString()
 								.substring(3);
 					}
 				}
+				dossier = Paths.get(dossier).subpath(1, Paths.get(dossier).getNameCount()).toString();
+				String dossierCopy = dossier.replaceAll("\\\\", "__");
 
-				this.listeAlbumsAjoutes.add(dossier);
-				Files.createDirectories(Paths.get(this.cheminDest.toString(), dossier));
+				if (!(this.checkAlbumDestSource(this.cheminDest.resolve(dossierCopy).toString()))) {
+					this.listeAlbumsAjoutes.add(dossierCopy);
+					Files.createDirectory(this.cheminDest.resolve(dossierCopy));
+					System.out.println(
+							"CTRL sce " + Paths.get(this.cheminSce.toString(), genre + "\\" + dossier).toString()
+									+ " CTRL dest " + Paths.get(this.cheminDest.toString(), dossierCopy).toString());
 
-				System.out.println("CTRL sce " + Paths.get(this.cheminSce.toString(), dossier).toString()
-						+ " CTRL dest " + Paths.get(this.cheminDest.toString(), dossier).toString());
-				for (Path p : ListerArbo.listerChanson(Paths.get(this.cheminSce.toString(), dossier))) {
-					// System.out.println(p);
-					Files.copy(p, Paths.get(this.cheminDest.toString(), p.toString().substring(3)),
-							StandardCopyOption.COPY_ATTRIBUTES);
+					for (Path p : ListerArbo
+							.listerChanson(Paths.get(this.cheminSce.toString(), genre + "\\" + dossier))) {
+						Files.copy(p,
+								Paths.get(this.cheminDest.resolve(dossierCopy).toString(), p.getFileName().toString()),
+								StandardCopyOption.COPY_ATTRIBUTES);
+					}
+
+					espaceRestant = this.calculEspace(this.cheminDest.toFile());
+					compteur++;
+				} else {
+					continue;
 				}
 
-				espaceRestant = this.calculEspace(this.cheminDest.toFile());
-				compteur++;
 				System.out.println("album copier : " + dossier + " espace restant " + espaceRestant);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -171,9 +177,7 @@ public class CopierMusique {
 					this.listeSuppr.add(listInt.get(i));
 				}
 			}
-			// Files.delete(pPath);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("FIN NETTOYAGE");
@@ -203,6 +207,24 @@ public class CopierMusique {
 		Random r = new Random();
 		int monTirage = r.nextInt(borne);
 		return monTirage;
+	}
+
+	private boolean checkAlbumDestSource(String albumTest) {
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(this.cheminDest)) {
+			for (Path p : stream) {
+				// System.out.println("CTRL existance " + albumTest + " -- " + p);
+				if (albumTest.equalsIgnoreCase(p.toString())) {
+					this.existence = true;
+					break;
+				} else {
+					this.existence = false;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return this.existence;
 	}
 
 	private long getDureeTitre(File titre) throws IOException {
