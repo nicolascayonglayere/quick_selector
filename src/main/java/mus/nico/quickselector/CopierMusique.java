@@ -65,7 +65,6 @@ public class CopierMusique {
 				// System.out.println("taille repo " + entry + " " + size);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -92,7 +91,6 @@ public class CopierMusique {
 				System.out.println(
 						"album copier : " + this.mesAlbums.get(alea).toString() + " espace restant " + espaceRestant);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -144,7 +142,6 @@ public class CopierMusique {
 
 				System.out.println("album copier : " + dossier + " espace restant " + espaceRestant);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -180,9 +177,7 @@ public class CopierMusique {
 					this.listeSuppr.add(listInt.get(i));
 				}
 			}
-			// Files.delete(pPath);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("FIN NETTOYAGE");
@@ -224,9 +219,8 @@ public class CopierMusique {
 				} else {
 					this.existence = false;
 				}
-			} // );
+			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

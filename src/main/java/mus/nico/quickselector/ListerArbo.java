@@ -23,7 +23,6 @@ public class ListerArbo {
 				}
 			});
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("nb de genres :" + genres.size());
@@ -40,7 +39,6 @@ public class ListerArbo {
 					groupes.add(p);
 				});
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -54,13 +52,7 @@ public class ListerArbo {
 			stream.forEach(p -> {
 				groupes.add(p);
 			});
-//			
-//			for (Path entry : stream) {
-//				// System.out.println(entry);
-//				groupes.add(entry);
-//			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("nb de groupes " + groupes.size() + " du genre " + pGenre);
@@ -73,13 +65,7 @@ public class ListerArbo {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(pa)) {
 				stream.forEach(p -> {
 					if (Files.isDirectory(p)) {
-						// --TODO parser le contenu s'il y a encore des dossiers
-						p.forEach(pat -> {
-							if (Files.isDirectory(pat)) {
-								albums.add(pat);
-							}
-						});
-						albums.add(p);
+						albums.addAll(ListerArbo.listerCDAlbum(p));
 					} else {
 						albums.add(pa);
 					}
@@ -89,6 +75,22 @@ public class ListerArbo {
 			}
 		});
 		return albums;
+	}
+
+	protected static List<Path> listerCDAlbum(Path pAlbum) {
+		List<Path> cdAlbum = new ArrayList<>();
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(pAlbum)) {
+			stream.forEach(p -> {
+				if (Files.isRegularFile(p)) {
+					cdAlbum.add(p.getParent());
+				} else {
+					cdAlbum.add(p);
+				}
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return cdAlbum;
 	}
 
 	protected static List<Path> listerChanson(Path pAlbum) {
