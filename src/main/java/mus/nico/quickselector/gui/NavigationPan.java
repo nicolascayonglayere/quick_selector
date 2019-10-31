@@ -20,7 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import mus.nico.quickselector.ListerArbo;
+import mus.nico.quickselector.utils.ListerArbo;
 import net.samuelcampos.usbdrivedetector.USBDeviceDetectorManager;
 
 public class NavigationPan extends JPanel {

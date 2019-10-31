@@ -1,4 +1,4 @@
-package mus.nico.quickselector;
+package mus.nico.quickselector.utils;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -59,7 +59,7 @@ public class ListerArbo {
 		return groupes;
 	}
 
-	protected static List<Path> listerAlbums() {
+	public static List<Path> listerAlbums() {
 		List<Path> albums = new ArrayList<Path>();
 		ListerArbo.listerGroupe().stream().forEachOrdered(pa -> {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(pa)) {
@@ -93,7 +93,7 @@ public class ListerArbo {
 		return cdAlbum;
 	}
 
-	protected static List<Path> listerChanson(Path pAlbum) {
+	public static List<Path> listerChanson(Path pAlbum) {
 		List<Path> chansons = new ArrayList<Path>();
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(pAlbum)) {
 			stream.forEach(p -> {
@@ -109,7 +109,8 @@ public class ListerArbo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("nb de chansons " + chansons.size() + " dans l'album " + pAlbum);
+		// System.out.println("nb de chansons " + chansons.size() + " dans l'album " +
+		// pAlbum);
 		return chansons;
 	}
 

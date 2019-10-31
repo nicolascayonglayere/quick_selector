@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import mus.nico.quickselector.CopierMusique;
+import mus.nico.quickselector.utils.CopierMusique;
 
 public class MaFenetre extends JFrame {
 
