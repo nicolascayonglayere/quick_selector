@@ -1,4 +1,4 @@
-package mus.nico.quickselector;
+package mus.nico.quickselector.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,8 @@ public class CopierMusique {
 	private List<String> listeAlea;
 
 	private boolean existence;
+
+	// private CopyTaskFx copyTaskFx;
 
 	public CopierMusique(Path pSce, Path pDest, List<Boolean> pOptions) {
 		this.setCheminSce(pSce);
@@ -81,6 +83,8 @@ public class CopierMusique {
 				Files.createDirectories(Paths.get(this.monUSB.getPath(), dossier));
 				System.out.println("CTRL sce " + this.mesAlbums.get(alea).toString() + " CTRL dest "
 						+ Paths.get(this.monUSB.getPath(), dossier).toString());
+
+				// copyTask.call();
 				for (Path p : ListerArbo.listerChanson(this.mesAlbums.get(alea))) {
 					// System.out.println(p);
 					Files.copy(p, Paths.get(this.monUSB.getPath(), p.toString().substring(3)),
@@ -98,6 +102,7 @@ public class CopierMusique {
 	}
 
 	public void copierAlbumJournee() {
+
 		this.listeAlbumsAjoutes = new ArrayList<String>();
 		// this.mesAlbums = ListerArbo.listerAlbums();
 		System.out.println("CTRL------------------" + this.cheminDest.toString());
@@ -123,6 +128,7 @@ public class CopierMusique {
 				if (!(this.checkAlbumDestSource(this.cheminDest.resolve(dossierCopy).toString()))) {
 					this.listeAlbumsAjoutes.add(dossierCopy);
 					Files.createDirectory(this.cheminDest.resolve(dossierCopy));
+
 					System.out.println(
 							"CTRL sce " + Paths.get(this.cheminSce.toString(), genre + "\\" + dossier).toString()
 									+ " CTRL dest " + Paths.get(this.cheminDest.toString(), dossierCopy).toString());
@@ -331,5 +337,13 @@ public class CopierMusique {
 	public void setListeAlea(List<String> listeAlea) {
 		this.listeAlea = listeAlea;
 	}
+
+//	public CopyTaskFx getCopyTaskFx() {
+//		return this.copyTaskFx;
+//	}
+//
+//	public void setCopyTaskFx(CopyTaskFx copyTaskFx) {
+//		this.copyTaskFx = copyTaskFx;
+//	}
 
 }
