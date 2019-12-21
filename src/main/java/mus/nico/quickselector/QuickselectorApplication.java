@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,14 +16,14 @@ import javafx.stage.Stage;
 import mus.nico.quickselector.fx.view.QuickSelectorController;
 
 @SpringBootApplication
-public class QuickselectorApplication extends Application {
+public class QuickselectorApplication extends AbstractJavaFxApplicationSupport {// Application {
 
 	/**
 	 * Version swing
 	 * 
 	 * @param args
 	 */
-//	public static void main(String[] args) {
+	public static void main(String[] args) {
 //		// SpringApplication.run(QuickselectorApplication.class, args);
 //		SpringApplicationBuilder builder = new SpringApplicationBuilder(QuickselectorApplication.class);
 //
@@ -32,7 +33,9 @@ public class QuickselectorApplication extends Application {
 //
 //		MaFenetre mf = new MaFenetre();
 //		mf.setVisible(true);
-//	}
+
+		Application.launch(args);
+	}
 
 	/**
 	 * Version JavaFx
