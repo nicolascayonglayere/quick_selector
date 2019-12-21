@@ -53,18 +53,8 @@ public class QuickselectorApplication extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-//        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-//        double width = visualBounds.getWidth();
-//        double height = visualBounds.getHeight();
-// 
-//        primaryStage.setScene(new Scene(rootNode, width, height));
-//        primaryStage.centerOnScreen();
-//        primaryStage.show();
-
 		this.primaryStage = primaryStage;
 		this.primaryStage.setTitle("QuickSelector");
-
-		// this.spc = new SelectPanelController();
 
 		this.initRootLayout();
 
@@ -78,7 +68,7 @@ public class QuickselectorApplication extends Application {
 		this.primaryStage.show();
 	}
 
-	public void showQuickSelectorOverview() {
+	public void showQuickSelectorOverview() throws NoSuchMethodException, SecurityException {
 		try {
 			// Load person overview.
 			FXMLLoader loader = new FXMLLoader();
@@ -90,7 +80,9 @@ public class QuickselectorApplication extends Application {
 
 			// Give the controller access to the main app.
 			QuickSelectorController spc = loader.getController();
+
 			spc.setMainApp(this);
+			spc.init();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

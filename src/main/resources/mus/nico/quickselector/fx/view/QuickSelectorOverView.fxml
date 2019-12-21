@@ -69,7 +69,7 @@
                               <Font size="14.0" />
                            </font>
                         </RadioButton>
-                        <RadioButton fx:id="listeAlea" layoutX="226.0" layoutY="23.0" mnemonicParsing="false" text="Liste aleatoire">
+                        <RadioButton fx:id="semaineTravail" layoutX="226.0" layoutY="23.0" mnemonicParsing="false" text="Semaine de travail">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -78,12 +78,12 @@
                   </AnchorPane>
               </items>
             </SplitPane>
-            <Button fx:id="validerButton" layoutX="708.0" layoutY="835.0" mnemonicParsing="false" onAction="#selectAndAct" onMouseClicked="#selectAndAct" text="VALIDER">
+            <Button fx:id="validerButton" layoutX="708.0" layoutY="835.0" mnemonicParsing="false" onMouseReleased="#selectAndAct" text="VALIDER">
                <font>
                   <Font size="14.0" />
                </font>
             </Button>
-            <Button fx:id="annulerButton" layoutX="704.0" layoutY="868.0" mnemonicParsing="false" text="ANNULER">
+            <Button fx:id="annulerButton" cancelButton="true" layoutX="704.0" layoutY="868.0" mnemonicParsing="false" text="ANNULER">
                <font>
                   <Font size="14.0" />
                </font>

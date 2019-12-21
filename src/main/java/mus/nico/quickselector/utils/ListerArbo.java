@@ -25,7 +25,7 @@ public class ListerArbo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("nb de genres :" + genres.size());
+		// System.out.println("nb de genres :" + genres.size());
 
 		return genres;
 

@@ -20,7 +20,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.apache.tika.Tika;
 
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
-import mus.nico.quickselector.fx.CopyTaskFx;
 import net.samuelcampos.usbdrivedetector.USBDeviceDetectorManager;
 
 public class CopierMusique {
@@ -39,7 +38,7 @@ public class CopierMusique {
 
 	private boolean existence;
 
-	private CopyTaskFx copyTaskFx;
+	// private CopyTaskFx copyTaskFx;
 
 	public CopierMusique(Path pSce, Path pDest, List<Boolean> pOptions) {
 		this.setCheminSce(pSce);
@@ -339,12 +338,12 @@ public class CopierMusique {
 		this.listeAlea = listeAlea;
 	}
 
-	public CopyTaskFx getCopyTaskFx() {
-		return this.copyTaskFx;
-	}
-
-	public void setCopyTaskFx(CopyTaskFx copyTaskFx) {
-		this.copyTaskFx = copyTaskFx;
-	}
+//	public CopyTaskFx getCopyTaskFx() {
+//		return this.copyTaskFx;
+//	}
+//
+//	public void setCopyTaskFx(CopyTaskFx copyTaskFx) {
+//		this.copyTaskFx = copyTaskFx;
+//	}
 
 }

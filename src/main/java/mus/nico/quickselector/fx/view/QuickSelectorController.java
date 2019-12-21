@@ -20,8 +20,11 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import mus.nico.quickselector.QuickselectorApplication;
-import mus.nico.quickselector.fx.CopyTaskFx;
-import mus.nico.quickselector.utils.CopierMusique;
+import mus.nico.quickselector.fx.model.Album;
+import mus.nico.quickselector.fx.task.Copy10AlbumsTaskFx;
+import mus.nico.quickselector.fx.task.Copy99AlbumsTasksFx;
+import mus.nico.quickselector.fx.task.SuppressionTaskFx;
+import mus.nico.quickselector.utils.ConstructionListeTsAlbums;
 
 public class QuickSelectorController {
 
@@ -41,7 +44,7 @@ public class QuickSelectorController {
 	@FXML
 	private RadioButton suppression;
 	@FXML
-	private RadioButton listeAlea;
+	private RadioButton semaineTravail;
 	@FXML
 	private RadioButton jourTravail;
 
@@ -55,6 +58,28 @@ public class QuickSelectorController {
 	private QuickselectorApplication quickSelector;
 
 	private String monTexte;
+
+	private Copy10AlbumsTaskFx copy10Task;
+	private Copy99AlbumsTasksFx copy99Task;
+	private SuppressionTaskFx supprTask;
+
+	private List<Album> mesAlbums;
+
+	// @FXML
+	public void init() throws IOException {
+		this.mesAlbums = ConstructionListeTsAlbums.construireListe(Paths.get("H:\\"));// QuickSelectorController.this.etqSource.getText().substring(0,
+																						// 3)));
+		// this.annulerButton.setCancelButton(true);
+		this.txtArea.clear();
+		this.monTexte = "";
+		// this.barreProgression = new ProgressBar(0);
+		// Group
+		ToggleGroup group = new ToggleGroup();
+		this.suppression.setToggleGroup(group);
+		this.semaineTravail.setToggleGroup(group);
+		this.jourTravail.setToggleGroup(group);
+
+	}
 
 	@FXML
 	private void selectDossierSource() {
@@ -80,60 +105,44 @@ public class QuickSelectorController {
 			@Override
 			public void handle(ActionEvent event) {
 				QuickSelectorController.this.etqDestination.clear();
-				String chemDossierSource = fileChooser
+				String chemDossierDest = fileChooser
 						.showDialog(QuickSelectorController.this.quickSelector.getPrimaryStage()).getPath();
-				if (chemDossierSource != null) {
-					QuickSelectorController.this.printLog(QuickSelectorController.this.etqDestination,
-							chemDossierSource);
+				if (chemDossierDest != null) {
+					QuickSelectorController.this.printLog(QuickSelectorController.this.etqDestination, chemDossierDest);
 				}
 			}
 		});
 	}
 
 	@FXML
-	private void selectAndAct() {
-		this.txtArea.clear();
-		this.monTexte = "";
-		// this.barreProgression = new ProgressBar(0);
-		// Group
-		ToggleGroup group = new ToggleGroup();
-		this.suppression.setToggleGroup(group);
-		this.listeAlea.setToggleGroup(group);
-		this.jourTravail.setToggleGroup(group);
+	private void annuler() {
+		this.annulerButton.setCancelButton(true);
+		this.annulerButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				QuickSelectorController.this.txtArea.clear();
+				// QuickSelectorController.this.barreProgression.setProgress(0);
+				// QuickSelectorController.this.copy10Task.cancel(true);
+				QuickSelectorController.this.copy10Task.cancel();
+			}
+		});
+	}
+
+	@FXML
+	private void selectAndAct() throws IOException {
 
 		List<Boolean> options = new ArrayList<Boolean>();
 		options.add(this.suppression.isSelected());
 		options.add(this.jourTravail.isSelected());
-		options.add(this.listeAlea.isSelected());
+		options.add(this.semaineTravail.isSelected());
 
-		CopierMusique cm = new CopierMusique(
-				Paths.get(QuickSelectorController.this.etqSource.getText().substring(0, 3)),
-				Paths.get(QuickSelectorController.this.etqDestination.getText()), options);
+		options.stream().forEach(p -> System.out.println(p));
+		System.out.println(QuickSelectorController.this.etqDestination.getText());
 
 		if (options.get(0)) {
-
-			long begin = System.currentTimeMillis();
-			// MaFenetre.this.txtArea.repaint();
-			// MaFenetre.this.refreshAff();
-			cm.nettoyage();
-			long end = System.currentTimeMillis();
-			float time = (end - begin) / 1000f;
-			for (String s : cm.getListeSuppr()) {
-				this.monTexte += "\n " + s;
-			}
-
-			QuickSelectorController.this.txtArea.setText("DOSSIERS SUPPRIMES : " + this.monTexte + " \n "
-					+ "Temps d'execution nettoyage: " + String.valueOf(time));
-			System.out.println("Temps d'execution nettoyage: " + String.valueOf(time));
-			// MaFenetre.this.getContentPane().revalidate();
-			// MaFenetre.this.getContentPane().repaint();
-
-		}
-
-		if (options.get(1)) {
-			CopyTaskFx copyTask = new CopyTaskFx(
-					Paths.get(QuickSelectorController.this.etqSource.getText().substring(0, 3)),
-					Paths.get(QuickSelectorController.this.etqDestination.getText()));
+			this.supprTask = new SuppressionTaskFx(Paths.get(this.etqDestination.getText()));
+			this.txtArea.clear();
+			this.monTexte = "";
 			QuickSelectorController.this.statutsEtq.setTextFill(Color.BLUE);
 
 			// Unbind text property for Label.
@@ -141,20 +150,63 @@ public class QuickSelectorController {
 
 			// Bind the text property of Label
 			// with message property of Task
-			QuickSelectorController.this.statutsEtq.textProperty().bind(copyTask.messageProperty());
+			QuickSelectorController.this.statutsEtq.textProperty().bind(this.supprTask.messageProperty());
 
 			// this.validerButton.setDisable(true);
 
 			// Unbind progress property
 			QuickSelectorController.this.barreProgression.progressProperty().unbind();
 			QuickSelectorController.this.barreProgression.setProgress(0);
-			QuickSelectorController.this.barreProgression.progressProperty().bind(copyTask.progressProperty());
+			QuickSelectorController.this.barreProgression.progressProperty().bind(this.supprTask.progressProperty());
 			long begin = System.currentTimeMillis();
-			copyTask.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, //
+			this.supprTask.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, //
 					new EventHandler<WorkerStateEvent>() {
 						@Override
 						public void handle(WorkerStateEvent event) {
-							List<Path> copied = copyTask.getValue();
+							List<Path> copied = QuickSelectorController.this.supprTask.getValue();
+							QuickSelectorController.this.statutsEtq.textProperty().unbind();
+							// QuickSelectorController.this.statutsEtq.setText("Copied: " + copied.size());
+							copied.stream().forEachOrdered(p -> {
+								QuickSelectorController.this.monTexte += "\n" + p.toString();
+							});
+							long end = System.currentTimeMillis();
+							float time = (end - begin) / 1000f;
+							QuickSelectorController.this.txtArea
+									.setText("ALBUMS supprimes : " + QuickSelectorController.this.monTexte + " \n "
+											+ "Temps d'execution suppression : " + String.valueOf(time));
+						}
+
+					});
+			// Start the Task.
+			new Thread(this.supprTask).start();
+		}
+
+		if (options.get(1)) {
+			this.copy10Task = new Copy10AlbumsTaskFx(this.mesAlbums, Paths.get(this.etqDestination.getText()));
+			this.txtArea.clear();
+			this.monTexte = "";
+
+			QuickSelectorController.this.statutsEtq.setTextFill(Color.BLUE);
+
+			// Unbind text property for Label.
+			QuickSelectorController.this.statutsEtq.textProperty().unbind();
+
+			// Bind the text property of Label
+			// with message property of Task
+			QuickSelectorController.this.statutsEtq.textProperty().bind(this.copy10Task.messageProperty());
+
+			// this.validerButton.setDisable(true);
+
+			// Unbind progress property
+			QuickSelectorController.this.barreProgression.progressProperty().unbind();
+			QuickSelectorController.this.barreProgression.setProgress(0);
+			QuickSelectorController.this.barreProgression.progressProperty().bind(this.copy10Task.progressProperty());
+			long begin = System.currentTimeMillis();
+			this.copy10Task.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, //
+					new EventHandler<WorkerStateEvent>() {
+						@Override
+						public void handle(WorkerStateEvent event) {
+							List<Path> copied = QuickSelectorController.this.copy10Task.getValue();
 							QuickSelectorController.this.statutsEtq.textProperty().unbind();
 							// QuickSelectorController.this.statutsEtq.setText("Copied: " + copied.size());
 							copied.stream().forEachOrdered(p -> {
@@ -169,38 +221,53 @@ public class QuickSelectorController {
 
 					});
 			// Start the Task.
-			new Thread(copyTask).start();
+			new Thread(this.copy10Task).start();
 		}
 
 		if (options.get(2)) {
+			this.copy99Task = new Copy99AlbumsTasksFx(this.mesAlbums, Paths.get(this.etqDestination.getText()));
+			this.txtArea.clear();
+			this.monTexte = "";
+			this.statutsEtq.setTextFill(Color.BLUE);
 
+			// Unbind text property for Label.
+			this.statutsEtq.textProperty().unbind();
+
+			// Bind the text property of Label
+			// with message property of Task
+			this.statutsEtq.textProperty().bind(this.copy99Task.messageProperty());
+
+			// this.validerButton.setDisable(true);
+
+			// Unbind progress property
+			this.barreProgression.progressProperty().unbind();
+			this.barreProgression.setProgress(0);
+			this.barreProgression.progressProperty().bind(this.copy99Task.progressProperty());
 			long begin = System.currentTimeMillis();
-//			MaFenetre.this.refreshAff();
-			try {
-				cm.listeAleatoire();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			long end = System.currentTimeMillis();
-			float time = (end - begin) / 1000f;
-			for (String s : cm.getListeAlea()) {
-				this.monTexte += "\n" + s;
-			}
-			QuickSelectorController.this.txtArea.setText("TITRES AJOUTES : " + this.monTexte + " \n "
-					+ "Temps d'execution liste aléatoire: " + String.valueOf(time));
-			System.out.println("Temps d'execution liste aléatoire: " + String.valueOf(time));
+			// copy99Task.addEventFilter(WorkerStateEvent.WORKER_STATE_SUCCEEDED, //
+			this.copy99Task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED, //
+					new EventHandler<WorkerStateEvent>() {
+						@Override
+						public void handle(WorkerStateEvent event) {
+							List<Path> copied = QuickSelectorController.this.copy99Task.getValue();
+							QuickSelectorController.this.statutsEtq.textProperty().unbind();
+							// QuickSelectorController.this.statutsEtq.setText("Copied: " + copied.size());
+							copied.stream().forEachOrdered(p -> {
+								QuickSelectorController.this.monTexte += "\n" + p.toString();
+							});
+							long end = System.currentTimeMillis();
+							float time = (end - begin) / 1000f;
+							QuickSelectorController.this.txtArea
+									.setText("ALBUMS AJOUTES : " + QuickSelectorController.this.monTexte + " \n "
+											+ "Temps d'execution copie journee: " + String.valueOf(time));
+						}
+
+					});
+			// Start the Task.
+
+			new Thread(this.copy99Task).start();
+//			System.out.println("Temps d'execution semaine de travail: " + String.valueOf(time));
 		}
-//		group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
-//				// Has selection.
-//				if (group.getSelectedToggle() != null) {
-//					RadioButton button = (RadioButton) group.getSelectedToggle();
-//					System.out.println("Button: " + button.getText());
-//				}
-//			}
-//		});
 	}
 
 	private void printLog(TextField textArea, String files) {
